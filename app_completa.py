@@ -148,11 +148,9 @@ st.title('Music Data')
 
 # Display the top songs by popularity
 st.subheader('Top Songs by Popularity')
-top_songs = data.nlargest(5, 'popularity')
-
-# Create a pie chart
+top_songs = data.nlargest(3, 'popularity')
 fig_popularity = px.pie(top_songs, values='popularity', names='name', title='Top Songs by Popularity', color='name')
-fig_popularity.update_layout(showlegend=False, height=600, width=1000)
+fig_popularity.update_layout(height=600, width=1000)
 st.plotly_chart(fig_popularity)
 
 data['decade'] = (data['year'] // 10) * 10
