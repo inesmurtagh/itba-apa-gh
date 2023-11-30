@@ -38,8 +38,8 @@ def get_mean_vector(song_list, data):
     for song in song_list:
         song_data = get_song_data(song['name'], data)
         if song_data is None:
-            print(f"Warning: {song['name']} does not exist in the dataset")
-            return None
+            print(f"Warning: {song['name']} no existe en el dataset")
+            return ''
         song_vector = song_data[number_cols].values
         song_vectors.append(song_vector)
     song_matrix = np.array(list(song_vectors))
@@ -89,7 +89,7 @@ scaled_normalized_data = standard_scaler.fit_transform(normalized_data)
 # Streamlit app
 st.set_page_config(layout='wide')
 
-st.title('Sistema de recomendación de música')
+st.title('Sistema de recomendación de Música')
 st.subheader('Recomendaciones personalizadas de canciones')
 
 # Subheader
@@ -121,13 +121,13 @@ if st.sidebar.button('Recomendar'):
     seed_songs = [song for song in seed_songs if song['name']]
 
     if not seed_songs:
-        st.sidebar.warning("Please enter at least one song name.")
+        st.sidebar.warning("Porfavor, ingresar por lo menos una canción.")
     else:
         # Call the recommend_songs function
         recommended_songs = recommend_songs(seed_songs, data, n_recommendations)
 
         if not recommended_songs:
-            st.sidebar.warning("No recommendations available based on the provided songs.")
+            st.sidebar.warning("No hay recomendaciones disponibles para las canciones elegidas.")
         else:
             # Convert the recommended songs to a DataFrame
             recommended_df = pd.DataFrame(recommended_songs)
@@ -137,7 +137,7 @@ if st.sidebar.button('Recomendar'):
 
             # Verificar si la canción ingresada está en las recomendaciones
             if recommended_df['name'].str.lower().isin(excluded_songs).any():
-                st.sidebar.warning("The input song is included in the recommendations. Please try again with a different song.")
+                st.sidebar.warning("La canción esta incluida en las recomendaciones. Proba otra.")
             else :
                 # Create a bar plot of recommended songs by name
                 for index, row in recommended_df.iterrows():
