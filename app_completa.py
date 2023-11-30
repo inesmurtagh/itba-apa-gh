@@ -101,23 +101,31 @@ standard_scaler = StandardScaler()
 scaled_normalized_data = standard_scaler.fit_transform(normalized_data)
 
 # Streamlit app
-st.title('Music Recommender')
-st.header('Music Recommender Prompt')
+st.title('Sistema de recomendación de música')
+st.subheader('Recomendaciones personalizadas de canciones')
+
+# Subheader
+# st.subheader('| Sobre ')
+
+"""
+El modelo ofrece a los usuarios una lista seleccionada de canciones que son similares a las canciones elegidas.
+
+El sistema de recomendación funciona calculando la similitud entre canciones mediante diversas características numéricas como valencia, acústica, capacidad de baile y más.
+Los usuarios pueden ingresar los nombres de sus canciones favoritas, y el sistema generará una lista de canciones recomendadas que es probable que les gusten según las similitudes en estas características.
+
+"""
 
 # Streamlit app
-st.sidebar.subheader('Select to Filter the data')
-
-# Input for song names (use st.text_input or st.text_area)
-song_names = st.sidebar.text_area("Enter song names (one per line):")
+st.sidebar.subheader('Sistema de recomendación de música')
+song_names = st.sidebar.text_area("Escribir los nombres de las canciones (una por línea):")
 
 # Slider to select the number of recommendations
-n_recommendations = st.sidebar.slider("Select the number of recommendations:", 1, 10, 5)
+n_recommendations = st.sidebar.slider("Cantidad de recomendaciones:", 1, 10, 5)
 
-# Convert input to list of song names
 input_song_names = song_names.strip().split('\n') if song_names else []
 
-# Button to recommend songs
-if st.sidebar.button('Recommend'):
+# boton
+if st.sidebar.button('Recomendar'):
     # Convert input to list of seed songs
     seed_songs = [{'name': name.lower()} for name in input_song_names]
 
@@ -153,12 +161,13 @@ if st.sidebar.button('Recommend'):
 
 # About Me
 st.sidebar.markdown('---')
-st.sidebar.markdown('Demonstration App created with')
-st.sidebar.markdown('the toy dataset *Tips* from seaborn')
-st.sidebar.text('App created by Gustavo R Santos')
-st.sidebar.markdown('[Check out my blog on Medium](https://medium.com/gustavorsantos)')
+st.sidebar.markdown('')
+st.sidebar.markdown('App creada por:')
+st.sidebar.text('ofía Weintraub, Inés Murtagh y Josefina Soto Acebal')
+st.sidebar.markdown('[Link a la presentación](https://docs.google.com/presentation/d/1PrRhQbjNpI2GGjTz00z8F9oMch-MF1_hfVNl2CzEQqc/edit#slide=id.g1ec463fc7f2_0_15)')
 
-st.title('Music Data')
+st.markdown('---')
+st.subheader('| Datos interesantes')
 
 # Select year
 year = st.selectbox('Select year:', options=data['year'].unique())
