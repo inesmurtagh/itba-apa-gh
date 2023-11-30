@@ -146,10 +146,14 @@ if st.button('Recommend'):
 
 st.title('Music Data')
 
-# Display the top songs by popularity
-st.subheader('Top Songs by Popularity')
-top_songs = data.nlargest(3, 'popularity')
-fig_popularity = px.pie(top_songs, values='popularity', names='name', title='Top Songs by Popularity', color='name')
+# Select year
+year = st.selectbox('Select year:', options=data['year'].unique())
+data_year = data[data['year'] == year]
+
+# Display the top songs by popularity for the selected year
+st.subheader(f'Top Songs by Popularity for {year}')
+top_songs = data_year.nlargest(3, 'popularity')
+fig_popularity = px.pie(top_songs, values='popularity', names='name', title=f'Top Songs by Popularity for {year}', color='name')
 fig_popularity.update_layout(height=600, width=1000)
 st.plotly_chart(fig_popularity)
 
