@@ -159,7 +159,7 @@ if st.sidebar.button('Recomendar'):
                 fig = px.bar(recommended_df, y='name', x=range(len(recommended_df), 0, -1), title='Recommended Songs', orientation='h', color='name', text='text')
                 fig.update_layout(xaxis_title='Recommendation Rank', yaxis_title='Songs', showlegend=False, uniformtext_minsize=20, uniformtext_mode='show', yaxis_showticklabels=False, height=altura)
                 fig.update_traces(width=1)
-                st.plotly_chart(fig)
+                st.sidebar.plotly_chart(fig)
 
 # About Me
 st.sidebar.markdown('---')
