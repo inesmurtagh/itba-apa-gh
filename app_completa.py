@@ -123,8 +123,7 @@ if st.button('Recommend'):
             # Verificar si la canción ingresada está en las recomendaciones
             if recommended_df['name'].str.lower().isin(excluded_songs).any():
                 st.warning("The input song is included in the recommendations. Please try again with a different song.")
-
-             else:
+            else :
                 # Create a bar plot of recommended songs by name
                 recommended_df['text'] = recommended_df.apply(lambda row: f"{row.name + 1}. {row['name']} by {row['artists']} ({row['year']})", axis=1)
                 fig = px.bar(recommended_df, y='name', x=range(len(recommended_df), 0, -1), title='Recommended Songs', orientation='h', color='name', text='text')
