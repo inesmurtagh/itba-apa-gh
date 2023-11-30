@@ -32,8 +32,8 @@ clusters = pipe.predict(X)
 data['cluster'] = clusters
 
 # List of numerical columns to consider for similarity calculations
-number_cols = ['valence', 'year', 'decade', 'acousticness', 'danceability', 'duration_ms', 'energy', 'explicit',
-               'instrumentalness', 'liveness', 'loudness', 'popularity', 'speechiness', 'tempo', 'cluster']
+number_cols = ['valence', 'year', 'decade', 'acousticness', 'danceability', 'duration_ms', 'energy', 'explicit', 'key',
+               'mode', 'instrumentalness', 'liveness', 'loudness', 'popularity', 'speechiness', 'tempo', 'cluster']
 
 # Function to retrieve song data for a given song name
 def get_song_data(name, data):
@@ -151,7 +151,6 @@ year = st.selectbox('Select year:', options=data['year'].unique())
 data_year = data[data['year'] == year]
 
 # Display the top songs by popularity for the selected year
-st.subheader(f'Top Songs by Popularity for {year}')
 top_songs = data_year.nlargest(3, 'popularity')
 fig_popularity = px.pie(top_songs, values='popularity', names='name', title=f'Top Songs by Popularity for {year}', color='name')
 fig_popularity.update_layout(height=600, width=1000)
@@ -166,7 +165,7 @@ decade_counts = data['decade'].value_counts().sort_index()
 st.subheader('Number of Songs per Decade')
 fig_decades = px.bar(x=decade_counts.index, y=decade_counts.values,
                      labels={'x': 'Decade', 'y': 'Number of Songs'},
-                     title='Number of Songs per Decade', color=decade_counts.values)
+                     color=decade_counts.values)
 fig_decades.update_layout(xaxis_type='category', height=600, width=1000)
 st.plotly_chart(fig_decades)
 
@@ -179,11 +178,10 @@ fig_histogram.update_layout(height=500, width=1000)
 st.plotly_chart(fig_histogram)
 
 # Display a bar plot of artists with the most songs in the dataset
-st.subheader('Artists with Most Songs')
+st.subheader('Top Artists with Most Songs')
 top_artists = data['artists'].str.replace("[", "").str.replace("]", "").str.replace("'", "").value_counts().head(10)
 fig_top_artists = px.bar(top_artists, x=top_artists.index, y=top_artists.values, color=top_artists.index,
-                         labels={'x': 'Artist', 'y': 'Number of Songs'},
-                         title='Top Artists with Most Songs')
+                         labels={'x': 'Artist', 'y': 'Number of Songs'})
 fig_top_artists.update_xaxes(categoryorder='total descending')
 fig_top_artists.update_layout(height=600, width=1000, showlegend=False)
 st.plotly_chart(fig_top_artists)
