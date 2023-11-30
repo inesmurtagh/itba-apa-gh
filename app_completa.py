@@ -165,7 +165,8 @@ if st.sidebar.button('Recomendar'):
 st.sidebar.markdown('---')
 st.sidebar.markdown('')
 st.sidebar.markdown('App creada por:')
-st.sidebar.text('ofía Weintraub, Inés Murtagh y Josefina Soto Acebal')
+st.sidebar.text('Sofía Weintraub, Inés Murtagh')
+st.sidebar.text('y Josefina Soto Acebal')
 st.sidebar.markdown('[Link a la presentación](https://docs.google.com/presentation/d/1PrRhQbjNpI2GGjTz00z8F9oMch-MF1_hfVNl2CzEQqc/edit#slide=id.g1ec463fc7f2_0_15)')
 
 st.markdown('---')
@@ -198,7 +199,7 @@ st.plotly_chart(fig_decades, use_container_width=True)
 lista = ['valence', 'year', 'decade', 'acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'tempo', 'duration_ms']
 
 # Histograma
-st.subheader('Distribución de las características de las cacniones')
+st.subheader('Distribución de las características de las canciones')
 attribute_to_plot = st.selectbox('Seleccionar una característica:', lista)
 fig_histogram = px.histogram(data, x=attribute_to_plot, nbins=30,
                               title=f'Distribución de {attribute_to_plot}')
