@@ -191,7 +191,7 @@ st.subheader('Number of Songs per Decade')
 fig_decades = px.bar(x=decade_counts.index, y=decade_counts.values,
                      labels={'x': 'Decade', 'y': 'Number of Songs'},
                      color=decade_counts.values)
-fig_decades.update_layout(xaxis_type='category', height=600)
+fig_decades.update_layout(xaxis_type='category', height=600, use_container_width=True)
 st.plotly_chart(fig_decades)
 
 # Display the distribution of song attributes using a histogram
