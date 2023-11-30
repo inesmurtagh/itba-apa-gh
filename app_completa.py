@@ -71,6 +71,9 @@ def recommend_songs(seed_songs, data, n_recommendations=10):
             if len(rec_songs) == n_recommendations:
                 break
 
+    # Remove the seed song from recommendations if it's present
+    rec_songs = [song for song in rec_songs if song['name'].lower() != seed_songs[0]['name']]
+
     return pd.DataFrame(rec_songs)[metadata_cols].to_dict(orient='records')
 
 # Normalize the song data using Min-Max Scaler
@@ -117,15 +120,17 @@ if st.button('Recommend'):
             # Excluir la cancion ingresada por el usuario
             excluded_songs = [song['name'].lower() for song in seed_songs]
 
-            # Para asegurarnos que la cantidad de canciones recomendadas es igual a la cantidad elegida por el usuario
-            recommended_df = recommended_df[~recommended_df['name'].str.lower().isin(excluded_songs)].head(n_recommendations)
+            # Verificar si la canción ingresada está en las recomendaciones
+            if recommended_df['name'].str.lower().isin(excluded_songs).any():
+                st.warning("The input song is included in the recommendations. Please try again with a different song.")
 
-            # Create a bar plot of recommended songs by name
-            recommended_df['text'] = recommended_df.apply(lambda row: f"{row.name + 1}. {row['name']} by {row['artists']} ({row['year']})", axis=1)
-            fig = px.bar(recommended_df, y='name', x=range(len(recommended_df), 0, -1), title='Recommended Songs', orientation='h', color='name', text='text')
-            fig.update_layout(xaxis_title='Recommendation Rank', yaxis_title='Songs', showlegend=False, uniformtext_minsize=20, uniformtext_mode='show', yaxis_showticklabels=False, height=1000, width=1000)
-            fig.update_traces(width=1)
-            st.plotly_chart(fig)
+             else:
+                # Create a bar plot of recommended songs by name
+                recommended_df['text'] = recommended_df.apply(lambda row: f"{row.name + 1}. {row['name']} by {row['artists']} ({row['year']})", axis=1)
+                fig = px.bar(recommended_df, y='name', x=range(len(recommended_df), 0, -1), title='Recommended Songs', orientation='h', color='name', text='text')
+                fig.update_layout(xaxis_title='Recommendation Rank', yaxis_title='Songs', showlegend=False, uniformtext_minsize=20, uniformtext_mode='show', yaxis_showticklabels=False, height=1000, width=1000)
+                fig.update_traces(width=1)
+                st.plotly_chart(fig)
 
 st.title('Music Data')
 
