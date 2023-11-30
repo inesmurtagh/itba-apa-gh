@@ -155,7 +155,6 @@ fig_popularity.update_layout(showlegend=False, height=600, width=1000)
 
 st.plotly_chart(fig_popularity)
 
-pip install wordcloud
 
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
