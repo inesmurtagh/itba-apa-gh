@@ -170,12 +170,13 @@ st.sidebar.markdown('[Link a la presentación](https://docs.google.com/presentat
 
 st.markdown('---')
 st.subheader('| Datos interesantes')
+st.markdown('')
 
-# Select year
-year = st.selectbox('Select year:', options=data['year'].unique())
+st.subheader('Canciones más populares por año')
+
+year = st.selectbox('Seleccionar año:', options=data['year'].unique())
 data_year = data[data['year'] == year]
 
-# Display the top songs by popularity for the selected year
 top_songs = data_year.nlargest(3, 'popularity')
 fig_popularity = px.pie(top_songs, values='popularity', names='name', title=f'Top Songs by Popularity for {year}', color='name')
 fig_popularity.update_layout(height=600)
@@ -191,8 +192,8 @@ st.subheader('Number of Songs per Decade')
 fig_decades = px.bar(x=decade_counts.index, y=decade_counts.values,
                      labels={'x': 'Decade', 'y': 'Number of Songs'},
                      color=decade_counts.values)
-fig_decades.update_layout(xaxis_type='category', height=600, use_container_width=True)
-st.plotly_chart(fig_decades)
+fig_decades.update_layout(xaxis_type='category', height=600)
+st.plotly_chart(fig_decades, use_container_width=True)
 
 # Display the distribution of song attributes using a histogram
 st.subheader('Distribution of Song Attributes')
