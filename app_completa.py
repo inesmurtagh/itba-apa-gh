@@ -155,6 +155,21 @@ fig_popularity.update_layout(showlegend=False, height=600, width=1000)
 
 st.plotly_chart(fig_popularity)
 
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+# Create some sample text
+text = 'Fun, fun, awesome, awesome, tubular, astounding, superb, great, amazing, amazing, amazing, amazing'
+
+# Create and generate a word cloud image:
+wordcloud = WordCloud().generate(text)
+
+# Display the generated image:
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+st.pyplot()
+
 data['decade'] = (data['year'] // 10) * 10
 
 # Count the number of songs per decade
