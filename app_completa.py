@@ -15,12 +15,7 @@ from scipy.spatial.distance import cdist
 import plotly.express as px
 
 # Load your data
-data = pd.read_csv("data.csv")
-data['decade'] = (data['year'] // 10) * 10
-
-# Filter the data to keep rows where the 'name' contains at least one alphanumeric character
-data = data[data['name'].apply(lambda x: isinstance(x, str) and any(char.isalnum() for char in x))]
-data = data[data['artists'] != "['Эрих Мария Ремарк']"]
+data = pd.read_csv("dataset.csv")
 
 number_cols = ['valence', 'year', 'decade', 'acousticness', 'danceability', 'duration_ms', 'energy', 'explicit', 'key',
                'mode', 'instrumentalness', 'liveness', 'loudness', 'popularity', 'speechiness', 'tempo', 'cluster']
