@@ -154,12 +154,8 @@ if st.sidebar.button('Recomendar'):
                 st.sidebar.warning("The input song is included in the recommendations. Please try again with a different song.")
             else :
                 # Create a bar plot of recommended songs by name
-                recommended_df['text'] = recommended_df.apply(lambda row: f"{row.name + 1}. {row['name']} by {row['artists']} ({row['year']})", axis=1)
-                altura = len(recommended_df) * 50
-                fig = px.bar(recommended_df, y='name', x=range(len(recommended_df), 0, -1), title='Recommended Songs', orientation='h', color='name', text='text')
-                fig.update_layout(xaxis_title='Recommendation Rank', yaxis_title='Songs', showlegend=False, uniformtext_minsize=20, uniformtext_mode='show', yaxis_showticklabels=False, height=altura)
-                fig.update_traces(width=1)
-                st.sidebar.plotly_chart(fig)
+                for index, row in recommended_df.iterrows():
+                    st.sidebar.markdown(f"{index + 1}. {row['name']} by {row['artists']} ({row['year']})")
 
 # About Me
 st.sidebar.markdown('---')
