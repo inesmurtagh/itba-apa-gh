@@ -116,9 +116,12 @@ if st.button('Recommend'):
             # Convert the recommended songs to a DataFrame
             recommended_df = pd.DataFrame(recommended_songs)
 
-            # Excluir de la lista de recomendaciones la cancion ingresada por el usuario
+            # Excluir la cancion ingresada por el usuario
             excluded_songs = [song['name'].lower() for song in seed_songs]
             recommended_df = recommended_df[~recommended_df['name'].str.lower().isin(excluded_songs)]
+
+            # Para asegurarnos que la cantidad de canciones recomendadas es igual a la cantidad elegida por el usuario
+            recommended_df = recommended_df.head(n_recommendations)
 
 
             # Create a bar plot of recommended songs by name
