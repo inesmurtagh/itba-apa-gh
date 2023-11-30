@@ -22,6 +22,7 @@ data['decade'] = (data['year'] // 10) * 10
 
 # Filter the data to keep rows where the 'name' contains at least one alphanumeric character
 data = data[data['name'].apply(lambda x: any(char.isalnum() for char in x))]
+data = data[data['artists'] != "['Эрих Мария Ремарк']"]
 
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
