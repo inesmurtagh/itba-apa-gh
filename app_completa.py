@@ -105,7 +105,7 @@ st.title('Music Recommender')
 st.header('Music Recommender Prompt')
 
 # Streamlit app
-st.sidebar.title('Esta es la side bar')
+st.sidebar.subheader('Select to Filter the data')
 
 # Input for song names (use st.text_input or st.text_area)
 song_names = st.sidebar.text_area("Enter song names (one per line):")
