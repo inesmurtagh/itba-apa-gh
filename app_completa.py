@@ -39,7 +39,7 @@ def get_mean_vector(song_list, data):
         song_data = get_song_data(song['name'], data)
         if song_data is None:
             print(f"Warning: {song['name']} no existe en el dataset")
-            return ''
+            return None
         song_vector = song_data[number_cols].values
         song_vectors.append(song_vector)
     song_matrix = np.array(list(song_vectors))
