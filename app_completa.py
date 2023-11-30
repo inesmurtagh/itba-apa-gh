@@ -148,28 +148,12 @@ st.title('Music Data')
 
 # Display the top songs by popularity
 st.subheader('Top Songs by Popularity')
-top_songs = data.nlargest(10, 'popularity')
-fig_popularity = px.bar(top_songs, x='popularity', y='name', orientation='h',
-                        title='Top Songs by Popularity', color='name')
+top_songs = data.nlargest(5, 'popularity')
+
+# Create a pie chart
+fig_popularity = px.pie(top_songs, values='popularity', names='name', title='Top Songs by Popularity', color='name')
 fig_popularity.update_layout(showlegend=False, height=600, width=1000)
-
 st.plotly_chart(fig_popularity)
-
-
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-
-# Create some sample text
-text = 'Fun, fun, awesome, awesome, tubular, astounding, superb, great, amazing, amazing, amazing, amazing'
-
-# Create and generate a word cloud image:
-wordcloud = WordCloud().generate(text)
-
-# Display the generated image:
-plt.imshow(wordcloud, interpolation='bilinear')
-plt.axis("off")
-plt.show()
-st.pyplot()
 
 data['decade'] = (data['year'] // 10) * 10
 
