@@ -20,11 +20,14 @@ import plotly.express as px
 data = pd.read_csv("data.csv")
 data['decade'] = (data['year'] // 10) * 10
 
+# Filter the data to keep rows where the 'name' contains at least one alphanumeric character
+data = data[data['name'].apply(lambda x: any(char.isalnum() for char in x))]
+
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
-pipe = Pipeline([('scaler', StandardScaler()), ('kmeans', KMeans(n_clusters=5, random_state = 42,  verbose=False))], verbose=False)
+pipe = Pipeline([('scaler', StandardScaler()), ('kmeans', KMeans(n_clusters=5, random_state = 42))])
 
 X = data.select_dtypes(np.number)
 pipe.fit(X)
