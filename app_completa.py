@@ -104,17 +104,20 @@ scaled_normalized_data = standard_scaler.fit_transform(normalized_data)
 st.title('Music Recommender')
 st.header('Music Recommender Prompt')
 
+# Streamlit app
+st.sidebar.title('Esta es la side bar')
+
 # Input for song names (use st.text_input or st.text_area)
-song_names = st.text_area("Enter song names (one per line):")
+song_names = st.sidebar.text_area("Enter song names (one per line):")
 
 # Slider to select the number of recommendations
-n_recommendations = st.slider("Select the number of recommendations:", 1, 10, 5)
+n_recommendations = st.sidebar.slider("Select the number of recommendations:", 1, 10, 5)
 
 # Convert input to list of song names
 input_song_names = song_names.strip().split('\n') if song_names else []
 
 # Button to recommend songs
-if st.button('Recommend'):
+if st.sidebar.button('Recommend'):
     # Convert input to list of seed songs
     seed_songs = [{'name': name.lower()} for name in input_song_names]
 
@@ -122,13 +125,13 @@ if st.button('Recommend'):
     seed_songs = [song for song in seed_songs if song['name']]
 
     if not seed_songs:
-        st.warning("Please enter at least one song name.")
+        st.sidebar.warning("Please enter at least one song name.")
     else:
         # Call the recommend_songs function
         recommended_songs = recommend_songs(seed_songs, data, n_recommendations)
 
         if not recommended_songs:
-            st.warning("No recommendations available based on the provided songs.")
+            st.sidebar.warning("No recommendations available based on the provided songs.")
         else:
             # Convert the recommended songs to a DataFrame
             recommended_df = pd.DataFrame(recommended_songs)
@@ -138,7 +141,7 @@ if st.button('Recommend'):
 
             # Verificar si la canción ingresada está en las recomendaciones
             if recommended_df['name'].str.lower().isin(excluded_songs).any():
-                st.warning("The input song is included in the recommendations. Please try again with a different song.")
+                st.sidebar.warning("The input song is included in the recommendations. Please try again with a different song.")
             else :
                 # Create a bar plot of recommended songs by name
                 recommended_df['text'] = recommended_df.apply(lambda row: f"{row.name + 1}. {row['name']} by {row['artists']} ({row['year']})", axis=1)
@@ -147,6 +150,13 @@ if st.button('Recommend'):
                 fig.update_layout(xaxis_title='Recommendation Rank', yaxis_title='Songs', showlegend=False, uniformtext_minsize=20, uniformtext_mode='show', yaxis_showticklabels=False, height=altura, width=1000)
                 fig.update_traces(width=1)
                 st.plotly_chart(fig)
+
+# About Me
+st.sidebar.markdown('---')
+st.sidebar.markdown('Demonstration App created with')
+st.sidebar.markdown('the toy dataset *Tips* from seaborn')
+st.sidebar.text('App created by Gustavo R Santos')
+st.sidebar.markdown('[Check out my blog on Medium](https://medium.com/gustavorsantos)')
 
 st.title('Music Data')
 
