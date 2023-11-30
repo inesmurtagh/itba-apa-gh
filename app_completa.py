@@ -1,177 +1,157 @@
-import seaborn as sns
-import numpy as np
-import pandas as pd
+!pip install streamlit
+
 import streamlit as st
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from scipy.spatial.distance import cdist
 import plotly.express as px
 
-# Set Page Layout
-st.set_page_config(layout='wide')
+# Load your data
+data = pd.read_csv("data.csv")
 
+# List of numerical columns to consider for similarity calculations
+number_cols = ['valence', 'year', 'acousticness', 'danceability', 'duration_ms', 'energy', 'explicit',
+               'instrumentalness', 'liveness', 'loudness', 'popularity', 'speechiness', 'tempo']
 
-#Prueba 2
-#-----------------------------------------------------------------------
-# Load the Dataset
-df = sns.load_dataset('tips')
+# Function to retrieve song data for a given song name
+def get_song_data(name, data):
+    try:
+        return data[data['name'].str.lower() == name].iloc[0]
+    except IndexError:
+        return None
 
-# Add Lat Long
-latlong = {'NY': {'lat': 40.730610, 'lon': -73.935242},
-           'London': {'lat': 51.509865,'lon': -0.118092},
-           'Paris': {'lat': 48.864716, 'lon':2.349014},
-           'Sao Paulo': {'lat': -23.533773,'lon': -46.625290},
-           'Rome': {'lat': 41.902782,'lon': 12.496366}
-           }
+# Function to calculate the mean vector of a list of songs
+def get_mean_vector(song_list, data):
+    song_vectors = []
+    for song in song_list:
+        song_data = get_song_data(song['name'], data)
+        if song_data is None:
+            print(f"Warning: {song['name']} does not exist in the dataset")
+            return None
+        song_vector = song_data[number_cols].values
+        song_vectors.append(song_vector)
+    song_matrix = np.array(list(song_vectors))
+    return np.mean(song_matrix, axis=0)
 
-city = ['Paris', 'London', 'NY', 'Sao Paulo', 'Rome']
-np.random.seed(12)
-city_random = np.random.choice(city, 244)
+# Function to recommend songs based on a list of seed songs
+def recommend_songs(seed_songs, data, n_recommendations=10):
+    metadata_cols = ['name', 'artists', 'year']
+    song_center = get_mean_vector(seed_songs, data)
 
-# Add Cols
-df['city'] = city_random
-df['lat'] = [latlong[city]['lat'] for city in city_random]
-df['lon'] = [latlong[city]['lon'] for city in city_random]
+    # Return an empty list if song_center is missing
+    if song_center is None:
+        return []
 
-#-----------------------------------------------------------------------
+    # Normalize the song center
+    normalized_song_center = min_max_scaler.transform([song_center])
 
-# SIDEBAR
-# Let's add some functionalities in a sidebar
+    # Standardize the normalized song center
+    scaled_normalized_song_center = standard_scaler.transform(normalized_song_center)
 
-st.sidebar.subheader('Select to Filter the data')
+    # Calculate Euclidean distances and get recommendations
+    distances = cdist(scaled_normalized_song_center, scaled_normalized_data, 'euclidean')
+    index = np.argsort(distances)[0]
 
-# By Sex
-st.sidebar.text('By Sex')
-filter_sex = st.sidebar.radio('Filter By Sex', options=['Both', 'Female', 'Male'])
-if filter_sex == 'Both':
-    pass
-else:
-    df = df.query('sex == @filter_sex')
+    # Filter out seed songs and duplicates, then get the top n_recommendations
+    rec_songs = []
+    for i in index:
+        song_name = data.iloc[i]['name']
+        if song_name not in [song['name'] for song in seed_songs] and song_name not in [song['name'] for song in rec_songs]:
+            rec_songs.append(data.iloc[i])
+            if len(rec_songs) == n_recommendations:
+                break
 
-# By City
-st.sidebar.text('By City')
-filter_city = st.sidebar.multiselect('Filter By City', options=city, default=city)
-df = df.query('city in @filter_city')
+    return pd.DataFrame(rec_songs)[metadata_cols].to_dict(orient='records')
 
-# About Me
-st.sidebar.markdown('---')
+# Normalize the song data using Min-Max Scaler
+min_max_scaler = MinMaxScaler()
+normalized_data = min_max_scaler.fit_transform(data[number_cols])
 
-st.sidebar.markdown('Demonstration App created with')
-st.sidebar.markdown('the toy dataset *Tips* from seaborn')
+# Standardize the normalized data using Standard Scaler
+standard_scaler = StandardScaler()
+scaled_normalized_data = standard_scaler.fit_transform(normalized_data)
 
-st.sidebar.text('App created by Gustavo R Santos')
-st.sidebar.markdown('[Check out my blog on Medium](https://medium.com/gustavorsantos)')
+# Streamlit app
+st.title('Music Recommender')
+st.header('Music Recommender Prompt')
 
-#-----------------------------------------------------------------------
+# Input for song names (use st.text_input or st.text_area)
+song_names = st.text_area("Enter song names (one per line):")
 
-# Title
-st.title('Restaurants Dashboard')
+# Slider to select the number of recommendations
+n_recommendations = st.slider("Select the number of recommendations:", 1, 30, 10)
 
-# Subheader
-st.subheader('A quick view of the ***Good Meal*** restaurants around the world.')
-st.subheader('| About Us')
-# Another way to write text
-"""
-The *Good Meal* restaurants is an international chain founded in 2020 and currently present in 5 of the most important cities in the world: *NYC, São Paulo, London, Paris and Rome*.
+# Convert input to list of song names
+input_song_names = song_names.strip().split('\n') if song_names else []
 
-"""
+# Button to recommend songs
+if st.button('Recommend'):
+    # Convert input to list of seed songs
+    seed_songs = [{'name': name.lower()} for name in input_song_names]
 
-#Separator
-st.markdown('---')
+    # Filter out empty names
+    seed_songs = [song for song in seed_songs if song['name']]
 
-#-----------------------------------------------------------------------
+    if not seed_songs:
+        st.warning("Please enter at least one song name.")
+    else:
+        # Call the recommend_songs function
+        recommended_songs = recommend_songs(seed_songs, data, n_recommendations)
 
-# Columns Summary
+        if not recommended_songs:
+            st.warning("No recommendations available based on the provided songs.")
+        else:
+            # Convert the recommended songs to a DataFrame
+            recommended_df = pd.DataFrame(recommended_songs)
 
-st.subheader('| QUICK SUMMARY')
+            # Create a bar plot of recommended songs by name
+            recommended_df['text'] = recommended_df.apply(lambda row: f"{row.name + 1}. {row['name']} by {row['artists']} ({row['year']})", axis=1)
+            fig = px.bar(recommended_df, y='name', x=range(len(recommended_df), 0, -1), title='Recommended Songs', orientation='h', color='name', text='text')
+            fig.update_layout(xaxis_title='Recommendation Rank', yaxis_title='Songs', showlegend=False, uniformtext_minsize=20, uniformtext_mode='show', yaxis_showticklabels=False, height=1000, width=1000)
+            fig.update_traces(width=1)
+            st.plotly_chart(fig)
 
-col1, col2, col3, col4 = st.columns(4)
-# column 1 - Revenue Sum
-with col1:
-    total = f'${int( df.total_bill.sum() ):,}'
-    st.title(total)
-    st.text('REVENUE')
-# column 2 - Count of meals
-with col2:
-    st.title(df.city.count())
-    st.text('MEALS')
-# column 3 - Sum of clients
-with col3:
-    st.title(df.size.sum())
-    st.text('CLIENTS')
-# column 4 - Count of cities
-with col4:
-    st.title(df.city.nunique())
-    st.text('CITIES')
+st.title('Music Data')
 
-#-----------------------------------------------------------------------
+# Display the top songs by popularity
+st.subheader('Top Songs by Popularity')
+top_songs = data.nlargest(20, 'popularity')
+fig_popularity = px.bar(top_songs, x='popularity', y='name', orientation='h',
+                        title='Top Songs by Popularity', color='name')
+fig_popularity.update_layout(showlegend=False, height=1000, width=1000)
 
-# Graphics
-col1, col2, col3 = st.columns(3)
-# column 1 - Pie chart Gender
-with col1:
-    ind1 = pd.DataFrame(df.groupby('sex').sex.count()).rename(columns={'sex':'count'}).reset_index()
-    g1 = px.pie(ind1,
-                values='count',
-                names='sex',
-                color='sex',
-                color_discrete_map={'Male': 'royalblue','Female': 'pink'},
-                title='| GENDER')
-    g1.update_traces(textposition='inside',
-                     textinfo='percent+label',
-                     showlegend=False)
-    st.plotly_chart(g1, use_container_width=True)
+st.plotly_chart(fig_popularity)
 
-# column 2 - Bar chart Count Meals By day
-with col2:
-    ind3 = pd.DataFrame(df.groupby('day').day.count()).rename(columns={'day':'count'}).reset_index()
-    g3 = px.bar(ind3,
-                x='day',
-                y='count',
-                title='| POPULAR DAYS')
-    st.plotly_chart(g3, use_container_width=True)
+# Convert release_date to datetime and extract decade
+data['release_date'] = pd.to_datetime(data['release_date'])
+data['release_decade'] = (data['release_date'].dt.year // 10) * 10
 
-# column 3 - Pie chart Count Meals By Time
-with col3:
-    ind2 = pd.DataFrame(df.groupby('time').time.count()).rename(columns={'time':'count'}).reset_index()
-    g2 = px.pie(ind2,
-                values='count',
-                names='time',
-                color='time',
-                color_discrete_map={'Lunch': 'royalblue','Dinner': 'darkblue'},
-                title='| POPULAR TIMES')
-    g2.update_traces(textposition='inside',
-                     textinfo='percent+label',
-                     showlegend=False)
-    st.plotly_chart(g2, use_container_width=True)
+# Count the number of songs per decade
+decade_counts = data['release_decade'].value_counts().sort_index()
 
-#-----------------------------------------------------------------------
-st.subheader('| WHERE ARE WE MAKING MORE MONEY')
-# Measurements
-col1, col2 = st.columns(2)
-# column 1 X Axis
-with col1:
-    x = st.selectbox('Select the X Axis', options=df.columns, index=7)
-# column 2 Y axis
-with col2:
-    y = st.selectbox('Select the Y Axis', options=df.columns)
+# Display the number of songs per decade
+st.subheader('Number of Songs per Decade')
+fig_decades = px.bar(x=decade_counts.index, y=decade_counts.values,
+                     labels={'x': 'Decade', 'y': 'Number of Songs'},
+                     title='Number of Songs per Decade', color=decade_counts.values)
+fig_decades.update_layout(xaxis_type='category', height=1000, width=1000)
+st.plotly_chart(fig_decades)
 
-# Show mean checkbox
-mean_yes = st.checkbox('Mean')
-if mean_yes:
-           df_mean = df.groupby(x).mean().reset_index()
-           g4 = px.bar(df_mean,
-            x= x,
-            y= y)
-           st.plotly_chart(g4, use_container_width=True)
-else:
-           g4 = px.bar(df,
-                       x= x,
-                       y= y)
-           st.plotly_chart(g4, use_container_width=True)
+# Display the distribution of song attributes using a histogram
+st.subheader('Distribution of Song Attributes')
+attribute_to_plot = st.selectbox('Select an attribute to plot:', number_cols)
+fig_histogram = px.histogram(data, x=attribute_to_plot, nbins=30,
+                              title=f'Distribution of {attribute_to_plot}')
+fig_histogram.update_layout(height=1000, width=1000)
+st.plotly_chart(fig_histogram)
 
-#-----------------------------------------------------------------------
-
-# Map
-st.subheader('| WHERE ARE OUR RESTAURANTS')
-df_map = df[['city','tip','lat', 'lon']]
-st.map(df_map, zoom=2)
-
-#-----------------------------------------------------------------------
+# Display a bar plot of artists with the most songs in the dataset
+st.subheader('Artists with Most Songs')
+top_artists = data['artists'].str.replace("[", "").str.replace("]", "").str.replace("'", "").value_counts().head(20)
+fig_top_artists = px.bar(top_artists, x=top_artists.index, y=top_artists.values, color=top_artists.index,
+                         labels={'x': 'Artist', 'y': 'Number of Songs'},
+                         title='Top Artists with Most Songs')
+fig_top_artists.update_xaxes(categoryorder='total descending')
+fig_top_artists.update_layout(height=1000, width=1000, showlegend=False)
+st.plotly_chart(fig_top_artists)
