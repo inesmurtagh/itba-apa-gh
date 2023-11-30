@@ -163,7 +163,7 @@ data_year = data[data['year'] == year]
 
 top_songs = data_year.nlargest(3, 'popularity')
 fig_popularity = px.pie(top_songs, values='popularity', names='name', color='name')
-fig_popularity.update_layout(height=400)
+fig_popularity.update_layout(height=500)
 st.plotly_chart(fig_popularity, use_container_width=True)
 
 data['decade'] = (data['year'] // 10) * 10
@@ -195,5 +195,5 @@ top_artists = data['artists'].str.replace("[", "").str.replace("]", "").str.repl
 fig_top_artists = px.bar(top_artists, x=top_artists.index, y=top_artists.values, color=top_artists.index,
                          labels={'x': 'Artista', 'y': 'Número of Canciones'})
 fig_top_artists.update_xaxes(categoryorder='total descending')
-fig_top_artists.update_layout(height=600, showlegend=False)
+fig_top_artists.update_layout(height=500, showlegend=False)
 st.plotly_chart(fig_top_artists, use_container_width=True)
