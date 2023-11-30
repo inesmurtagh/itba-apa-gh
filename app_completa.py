@@ -101,6 +101,8 @@ standard_scaler = StandardScaler()
 scaled_normalized_data = standard_scaler.fit_transform(normalized_data)
 
 # Streamlit app
+st.set_page_config(layout='wide')
+
 st.title('Sistema de recomendación de música')
 st.subheader('Recomendaciones personalizadas de canciones')
 
@@ -155,7 +157,7 @@ if st.sidebar.button('Recomendar'):
                 recommended_df['text'] = recommended_df.apply(lambda row: f"{row.name + 1}. {row['name']} by {row['artists']} ({row['year']})", axis=1)
                 altura = len(recommended_df) * 50
                 fig = px.bar(recommended_df, y='name', x=range(len(recommended_df), 0, -1), title='Recommended Songs', orientation='h', color='name', text='text')
-                fig.update_layout(xaxis_title='Recommendation Rank', yaxis_title='Songs', showlegend=False, uniformtext_minsize=20, uniformtext_mode='show', yaxis_showticklabels=False, height=altura, width=1000)
+                fig.update_layout(xaxis_title='Recommendation Rank', yaxis_title='Songs', showlegend=False, uniformtext_minsize=20, uniformtext_mode='show', yaxis_showticklabels=False, height=altura)
                 fig.update_traces(width=1)
                 st.plotly_chart(fig)
 
@@ -176,7 +178,7 @@ data_year = data[data['year'] == year]
 # Display the top songs by popularity for the selected year
 top_songs = data_year.nlargest(3, 'popularity')
 fig_popularity = px.pie(top_songs, values='popularity', names='name', title=f'Top Songs by Popularity for {year}', color='name')
-fig_popularity.update_layout(height=600, width=1000)
+fig_popularity.update_layout(height=600)
 st.plotly_chart(fig_popularity)
 
 data['decade'] = (data['year'] // 10) * 10
@@ -189,7 +191,7 @@ st.subheader('Number of Songs per Decade')
 fig_decades = px.bar(x=decade_counts.index, y=decade_counts.values,
                      labels={'x': 'Decade', 'y': 'Number of Songs'},
                      color=decade_counts.values)
-fig_decades.update_layout(xaxis_type='category', height=600, width=1000)
+fig_decades.update_layout(xaxis_type='category', height=600)
 st.plotly_chart(fig_decades)
 
 # Display the distribution of song attributes using a histogram
@@ -197,7 +199,7 @@ st.subheader('Distribution of Song Attributes')
 attribute_to_plot = st.selectbox('Select an attribute to plot:', number_cols)
 fig_histogram = px.histogram(data, x=attribute_to_plot, nbins=30,
                               title=f'Distribution of {attribute_to_plot}')
-fig_histogram.update_layout(height=500, width=1000)
+fig_histogram.update_layout(height=500)
 st.plotly_chart(fig_histogram)
 
 # Display a bar plot of artists with the most songs in the dataset
@@ -206,5 +208,5 @@ top_artists = data['artists'].str.replace("[", "").str.replace("]", "").str.repl
 fig_top_artists = px.bar(top_artists, x=top_artists.index, y=top_artists.values, color=top_artists.index,
                          labels={'x': 'Artist', 'y': 'Number of Songs'})
 fig_top_artists.update_xaxes(categoryorder='total descending')
-fig_top_artists.update_layout(height=600, width=1000, showlegend=False)
+fig_top_artists.update_layout(height=600, showlegend=False)
 st.plotly_chart(fig_top_artists)
