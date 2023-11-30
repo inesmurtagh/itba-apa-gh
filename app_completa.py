@@ -18,10 +18,22 @@ import plotly.express as px
 
 # Load your data
 data = pd.read_csv("data.csv")
+data['decade'] = (data['year'] // 10) * 10
+
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
+pipe = Pipeline([('scaler', StandardScaler()), ('kmeans', KMeans(n_clusters=5, random_state = 42,  verbose=False))], verbose=False)
+
+X = data.select_dtypes(np.number)
+pipe.fit(X)
+clusters = pipe.predict(X)
+data['cluster'] = clusters
 
 # List of numerical columns to consider for similarity calculations
-number_cols = ['valence', 'year', 'acousticness', 'danceability', 'duration_ms', 'energy', 'explicit',
-               'instrumentalness', 'liveness', 'loudness', 'popularity', 'speechiness', 'tempo']
+number_cols = ['valence', 'year', 'decade', 'acousticness', 'danceability', 'duration_ms', 'energy', 'explicit',
+               'instrumentalness', 'liveness', 'loudness', 'popularity', 'speechiness', 'tempo', 'cluster']
 
 # Function to retrieve song data for a given song name
 def get_song_data(name, data):
